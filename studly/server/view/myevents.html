@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Studly</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/navbar-fixed-top.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="">Studly</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">All Events</a></li>
+            <li class="active"><a href="myevents">My Events</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="https://github.com/zachwhaley/studly/">Fork us!</a>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <div id="events" class="list_group"></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <p>
+            <form class="form-horizontal" action="import-event" method="POST" role="form">
+              <div class="form-group">
+                <label for="inputEvent" class="col-sm-1 control-label"></label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="inputEvent" name="title" placeholder="Event name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputCalendar" class="col-sm-1 control-label"></label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="inputCalendar" name="calendarId"
+                  placeholder="Calendar name">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-1 col-sm-10">
+                  <button type="submit" class="btn btn-default">Import Event</button>
+                </div>
+              </div>
+            </form>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+      $.getJSON("get-mappings.json", function(evts) {
+        $.each(evts, function(i, evt) {
+          $("#events")
+          .append($('<a>')
+            .attr("class", "list-group-item active")
+            .attr("href", evt.htmlLink)
+            .append($('<div>')
+              .attr("class", "row")
+              .append($('<div>')
+                .attr("class", "col-md-7")
+                .append($('<h3>')
+                  .attr("class", "list-group-item-heading")
+                  .text(evt.title)
+                )
+              )
+              .append($('<div>')
+                .attr("class", "col-md-1")
+                .append($('<form>')
+                  .attr("action", "remove-event")
+                  .attr("method", "POST")
+                  .append($('<input>')
+                    .attr("class", "btn btn-danger")
+                    .attr("type", "submit")
+                    .attr("value", "Remove Event")
+                  )
+                  .append($('<input>')
+                    .attr("type", "hidden")
+                    .attr("name", "title")
+                    .attr("value", evt.title)
+                  )
+                )
+              )
+            )
+          );
+          $.each(evt.reflectorList, function(i, email) {
+            $("#events")
+            .append($('<div>')
+              .attr("class", "list-group-item")
+              .append($('<div>')
+                .attr("class", "row")
+                .append($('<div>')
+                  .attr("class", "col-md-7")
+                  .text(email)
+                )
+                .append($('<div>')
+                  .attr("class", "col-md-1")
+                  .append($('<form>')
+                    .attr("action", "remove-email")
+                    .attr("method", "POST")
+                    .append($('<input>')
+                      .attr("class", "btn btn-danger")
+                      .attr("type", "submit")
+                      .attr("value", "Remove")
+                    )
+                    .append($('<input>')
+                      .attr("type", "hidden")
+                      .attr("name", "emailAddress")
+                      .attr("value", email)
+                    )
+                    .append($('<input>')
+                      .attr("type", "hidden")
+                      .attr("name", "calendarId")
+                      .attr("value", evt.calendarId)
+                    )
+                    .append($('<input>')
+                      .attr("type", "hidden")
+                      .attr("name", "title")
+                      .attr("value", evt.title)
+                    )
+                  )
+                )
+              )
+            );
+          });
+          $("#events")
+          .append($('<div>')
+            .attr("class", "list-group-item")
+            .append($('<div>')
+              .attr("class", "row")
+              .append($('<form>')
+                .attr("class", "form-inline")
+                .attr("action", "add-email")
+                .attr("method", "POST")
+                .attr("role", "form")
+                .append($('<div>')
+                  .attr("class", "col-md-7")
+                  .append($('<div>')
+                    .attr("class", "form-group")
+                    .append($('<label>')
+                      .attr("class", "sr-only")
+                      .attr("for", "newEmail")
+                      .text("Email address")
+                    )
+                    .append($('<input>')
+                      .attr("class", "form-control")
+                      .attr("id", "newEmail")
+                      .attr("type", "email")
+                      .attr("name", "emailAddress")
+                      .attr("placeholder", "Add email")
+                    )
+                    .append($('<input>')
+                      .attr("type", "hidden")
+                      .attr("name", "calendarId")
+                      .attr("value", evt.calendarId)
+                    )
+                    .append($('<input>')
+                      .attr("type", "hidden")
+                      .attr("name", "title")
+                      .attr("value", evt.title)
+                    )
+                  )
+                )
+                .append($('<div>')
+                  .attr("class", "col-md-1")
+                  .append($('<button>')
+                    .attr("class", "btn btn-default")
+                    .attr("type", "submit")
+                    .text("Add")
+                  )
+                )
+              )
+            )
+          )
+        });
+      });
+    });
+    </script>
+</body>
+</html>
